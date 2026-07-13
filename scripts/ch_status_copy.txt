@@ -1,0 +1,23 @@
+=== CH STATUS @ 23:53:41 ===
+  raw_logs                                       30,270
+  security_events                               175,807
+  network_events                                303,403
+  process_events                                      3
+  triage_scores                               2,188,809
+  hunter_investigations                           1,496
+  verifier_results                                  510
+  evidence_anchors                                   40
+  hunter_training_data                              880
+  TOTAL                                       2,701,218
+
+TRIAGE:
+  discard	831950	0.0333
+  monitor	1290766	0.8195
+  escalate	91093	0.9383
+
+HUNTER:
+  BEHAVIOURAL_ANOMALY	3
+  CONFIRMED_ATTACK	1499
+
+VERIFIER:
+  true_positive	516	0.6929

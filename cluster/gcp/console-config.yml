@@ -1,0 +1,7 @@
+# Redpanda Console — GCP Single-Broker Mode
+# All hostnames resolved via Docker DNS (same compose network)
+kafka:
+  brokers:
+    - "redpanda01:9092"
+  schemaRegistry:
+    enabled: false

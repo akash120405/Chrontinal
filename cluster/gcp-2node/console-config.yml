@@ -1,0 +1,9 @@
+# Redpanda Console — GCP 2-Node Mode
+# Connects to Node1 Redpanda brokers via extra_hosts → NODE1_INTERNAL_IP
+kafka:
+  brokers:
+    - "node1-rp01:17092"
+    - "node1-rp02:29900"
+    - "node1-rp03:39092"
+  schemaRegistry:
+    enabled: false

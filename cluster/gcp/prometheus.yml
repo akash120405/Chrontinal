@@ -1,0 +1,95 @@
+# =============================================================================
+# CLIF — Prometheus Configuration (GCP Single-VM)
+# =============================================================================
+# All targets are Docker container hostnames on the same compose network.
+# No extra_hosts needed — everything resolves via Docker DNS.
+# =============================================================================
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+  external_labels:
+    cluster: 'clif-siem'
+    environment: 'gcp-demo'
+
+rule_files:
+  - "/etc/prometheus/alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+
+  # ── ClickHouse (single node) ────────────────────────────────────────────
+  - job_name: "clickhouse-01"
+    static_configs:
+      - targets: ["clickhouse01:9363"]
+        labels:
+          node: "clickhouse01"
+          role: "standalone"
+          tier: "data"
+    metrics_path: /metrics
+
+  # ── Redpanda (single broker) ───────────────────────────────────────────
+  - job_name: "redpanda"
+    static_configs:
+      - targets: ["redpanda01:9644"]
+        labels:
+          tier: "data"
+    metrics_path: /public_metrics
+
+  # ── MinIO (single node) ────────────────────────────────────────────────
+  - job_name: "minio"
+    static_configs:
+      - targets: ["minio1:9000"]
+        labels:
+          tier: "data"
+    metrics_path: /minio/v2/metrics/cluster
+
+  - job_name: "minio-node"
+    static_configs:
+      - targets: ["minio1:9000"]
+        labels:
+          tier: "data"
+    metrics_path: /minio/v2/metrics/node
+
+  # ── Vector ─────────────────────────────────────────────────────────────
+  - job_name: "vector"
+    static_configs:
+      - targets: ["clif-vector:9598"]
+        labels:
+          service: "vector"
+          tier: "ingest"
+    metrics_path: /metrics
+
+  # ── Grafana ────────────────────────────────────────────────────────────
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana:3000"]
+        labels:
+          tier: "ui"
+    metrics_path: /metrics
+
+  # ── Prometheus self ────────────────────────────────────────────────────
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # ── Alertmanager ───────────────────────────────────────────────────────
+  - job_name: "alertmanager"
+    static_configs:
+      - targets: ["alertmanager:9093"]
+        labels:
+          service: "alertmanager"
+    metrics_path: /metrics
+
+  # ── LanceDB ────────────────────────────────────────────────────────────
+  - job_name: "lancedb"
+    static_configs:
+      - targets: ["clif-lancedb:8100"]
+        labels:
+          service: "lancedb"
+    metrics_path: /stats
+    scrape_interval: 30s

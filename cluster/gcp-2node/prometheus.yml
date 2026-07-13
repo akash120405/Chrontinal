@@ -1,0 +1,94 @@
+# =============================================================================
+# CLIF — Prometheus Configuration (GCP 2-Node Cluster)
+# =============================================================================
+# Node1 targets: resolved via extra_hosts → NODE1_INTERNAL_IP
+# Node2 targets: resolved via Docker container hostnames (same compose network)
+# =============================================================================
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+  external_labels:
+    cluster: 'clif-siem'
+    environment: 'gcp-2node'
+
+rule_files:
+  - "/etc/prometheus/alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+
+  # ── Node1 Data-Tier Targets (via VPC extra_hosts) ──────────────────────
+  - job_name: "clickhouse-01"
+    static_configs:
+      - targets: ["clickhouse01:9363"]
+        labels:
+          node: "clickhouse01"
+          role: "replica_01"
+          tier: "data"
+    metrics_path: /metrics
+
+  - job_name: "clickhouse-02"
+    static_configs:
+      - targets: ["clickhouse02:9364"]
+        labels:
+          node: "clickhouse02"
+          role: "replica_02"
+          tier: "data"
+    metrics_path: /metrics
+
+  - job_name: "redpanda"
+    static_configs:
+      - targets:
+          - "redpanda01:9644"
+          - "redpanda02:9645"
+          - "redpanda03:9646"
+        labels:
+          tier: "data"
+    metrics_path: /public_metrics
+
+  - job_name: "minio"
+    static_configs:
+      - targets: ["minio1:9002"]
+        labels:
+          tier: "data"
+    metrics_path: /minio/v2/metrics/cluster
+
+  - job_name: "vector"
+    static_configs:
+      - targets: ["vector:9598"]
+        labels:
+          service: "vector"
+          tier: "ingest"
+    metrics_path: /metrics
+
+  # ── Node2 Compute-Tier Targets (Docker DNS, local) ────────────────────
+  - job_name: "lancedb"
+    static_configs:
+      - targets: ["clif-lancedb:8100"]
+        labels:
+          service: "lancedb"
+    metrics_path: /stats
+    scrape_interval: 30s
+
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana:3000"]
+        labels:
+          tier: "ui"
+    metrics_path: /metrics
+
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "alertmanager"
+    static_configs:
+      - targets: ["alertmanager:9093"]
+        labels:
+          service: "alertmanager"
+    metrics_path: /metrics

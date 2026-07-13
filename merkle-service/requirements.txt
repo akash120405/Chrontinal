@@ -1,0 +1,2 @@
+clickhouse-driver[lz4]>=0.2.7,<1
+orjson>=3.10,<4
