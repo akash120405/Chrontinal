@@ -29,9 +29,6 @@ resources:
   # RBAC
   - rbac.yaml
 
-  # Secrets
-  - secrets/credentials.yaml
-
   # ConfigMaps (inline)
   - configmaps/redpanda-console.yaml
   - configmaps/prometheus.yaml
@@ -77,3 +74,14 @@ resources:
 # - configmaps/generated/clickhouse-schema.yaml
 # - configmaps/generated/vector-config.yaml
 # - configmaps/generated/grafana-dashboard.yaml
+
+# Keep local credentials outside version control. The generated name stays stable
+# because workloads refer to clif-credentials by name.
+secretGenerator:
+  - name: clif-credentials
+    namespace: clif
+    envs:
+      - secrets/credentials.env
+
+generatorOptions:
+  disableNameSuffixHash: true

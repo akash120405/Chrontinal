@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -15,7 +16,7 @@ import (
 // Lightweight HTTP server that triggers tcpblaster benchmarks on the VM.
 // Streams live progress to the client, then prints a clean final summary.
 
-const apiKey = "clif-bench-2026"
+var apiKey string
 
 var (
 	running   bool
@@ -131,6 +132,10 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	apiKey = os.Getenv("BENCHMARK_API_KEY")
+	if apiKey == "" {
+		log.Fatal("BENCHMARK_API_KEY is required")
+	}
 	port := 9515
 
 	http.HandleFunc("/benchmark", benchmarkHandler)

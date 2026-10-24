@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Robust nuclear clear - handles large tables with timeout-safe truncation"""
+import os
+import urllib.parse
 import urllib.request, time
 
-URL = 'http://localhost:8123/?user=clif_admin&password=Cl1f_Ch%40ngeM3_2026!&database=clif_logs'
+URL = ("http://localhost:8123/?" + urllib.parse.urlencode({"user": os.getenv("CLICKHOUSE_USER", "clif_admin"), "password": os.environ["CLICKHOUSE_PASSWORD"], "database": os.getenv("CLICKHOUSE_DB", "clif_logs")}))
 
 def ch(q, timeout=120):
     r = urllib.request.urlopen(urllib.request.Request(URL, data=q.encode()), timeout=timeout)

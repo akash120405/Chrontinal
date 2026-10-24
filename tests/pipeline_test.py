@@ -5,6 +5,7 @@ CLIF Pipeline End-to-End Validation Script
 Tests every component of the deployed pipeline.
 Run from PC1 (Windows) — connects to ClickHouse, Redpanda, XAI, etc.
 """
+import os
 import json
 import sys
 import urllib.request
@@ -13,7 +14,7 @@ import time
 
 CH_BASE = "http://10.180.247.221:8123"
 CH_USER = "clif_admin"
-CH_PASS = "Cl1f_Ch@ngeM3_2026!"
+CH_PASS = os.environ["CLICKHOUSE_PASSWORD"]
 XAI_BASE = "http://10.180.247.241:8200"
 GRAFANA_BASE = "http://10.180.247.241:3002"
 PROMETHEUS_BASE = "http://10.180.247.241:9090"

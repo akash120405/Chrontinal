@@ -67,7 +67,7 @@ EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", "384"))
 CH_HOST = os.getenv("CLICKHOUSE_HOST", "localhost")
 CH_PORT = int(os.getenv("CLICKHOUSE_PORT", "9000"))
 CH_USER = os.getenv("CLICKHOUSE_USER", "clif_admin")
-CH_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD", "Cl1f_Ch@ngeM3_2026!")
+CH_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD", "")
 CH_DB = os.getenv("CLICKHOUSE_DB", "clif_logs")
 
 SYNC_INTERVAL = int(os.getenv("SYNC_INTERVAL_SEC", "30"))

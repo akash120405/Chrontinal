@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111113">
+  <meta name="description" content="Chrontinal SOC connects security telemetry, investigations, AI assistance, and evidence in one workspace.">
+  <title>Chrontinal SOC — Turn Signals Into Action</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./config.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+<div class="site">
+  <header class="header">
+    <a class="brand" href="#overview" aria-label="Chrontinal SOC home"><span class="brandMark">C</span><span>chrontinal <strong>SOC</strong></span></a>
+    <button class="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="landing-navigation"><span aria-hidden="true">☰</span></button>
+    <a class="headerCta" href="#live-app" data-app-path="/login">Open live dashboard <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <nav id="landing-navigation" class="menuPanel" aria-label="Main navigation" aria-hidden="true">
+    <div class="menuAside"><span class="slashLabel">/ NAVIGATION</span><p>One workspace for the signals that matter.</p><a href="#live-app" data-app-path="/login">ENTER THE SOC <span aria-hidden="true">↗</span></a></div>
+    <div class="menuLinks">
+      <a href="#overview"><span>01</span>Overview<b aria-hidden="true">↗</b></a>
+      <a href="#platform"><span>02</span>Platform<b aria-hidden="true">↗</b></a>
+      <a href="#workflow"><span>03</span>Workflow<b aria-hidden="true">↗</b></a>
+      <a href="#modules"><span>04</span>Explore modules<b aria-hidden="true">↗</b></a>
+      <a href="#live-app"><span>05</span>Live dashboard<b aria-hidden="true">↗</b></a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero" id="overview">
+      <div class="signalGraphic" aria-hidden="true">
+        <div class="ambientOrb"></div>
+        <svg viewBox="0 0 700 660" class="graphicSvg" role="presentation">
+          <defs>
+            <radialGradient id="coreGradient"><stop stop-color="#f1aeff"/><stop offset=".28" stop-color="#b748f0" stop-opacity=".7"/><stop offset="1" stop-color="#21103f" stop-opacity="0"/></radialGradient>
+            <linearGradient id="edgeGradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffadf7"/><stop offset=".5" stop-color="#c03be8"/><stop offset="1" stop-color="#733dff"/></linearGradient>
+            <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <circle cx="355" cy="330" r="220" fill="url(#coreGradient)"/>
+          <g fill="none" stroke="#f1b6ff" stroke-width="2" opacity=".8"><circle cx="355" cy="330" r="132"/><ellipse cx="355" cy="330" rx="136" ry="53" transform="rotate(32 355 330)"/><ellipse cx="355" cy="330" rx="136" ry="53" transform="rotate(95 355 330)"/><ellipse cx="355" cy="330" rx="136" ry="53" transform="rotate(152 355 330)"/><path d="M355 198 480 282 432 442 274 447 222 290Z M355 198 274 447 M480 282 222 290 M432 442 355 198"/></g>
+          <g fill="none" stroke="url(#edgeGradient)" stroke-width="8" stroke-linejoin="round" filter="url(#edgeGlow)"><path d="M352 54 604 170 576 510 320 610 94 450 118 178Z M352 54 320 610 M118 178 576 510 M604 170 94 450"/></g>
+          <g fill="#da73f4" stroke="#ffd1ff" stroke-width="2"><circle cx="352" cy="54" r="13"/><circle cx="604" cy="170" r="13"/><circle cx="576" cy="510" r="13"/><circle cx="320" cy="610" r="13"/><circle cx="94" cy="450" r="13"/><circle cx="118" cy="178" r="13"/></g>
+        </svg>
+        <span class="orbitBadge badgeOne">DETECT</span><span class="orbitBadge badgeTwo">ANALYZE</span><span class="orbitBadge badgeThree">RESPOND</span>
+      </div>
+      <div class="heroTop"><p><span>/</span> A unified security operations workspace for detection, investigation, and response.</p><div><i></i> SECURITY OPERATIONS PLATFORM</div></div>
+      <div class="heroCopy"><p class="eyebrow">INTELLIGENCE AT EVERY TURN</p><h1><span>TURN SIGNALS</span><br>INTO <em>/ ACTION /</em></h1><div class="heroBottom"><div class="heroButtons"><a href="#live-app" data-app-path="/dashboard" class="primaryButton">Explore the dashboard <span aria-hidden="true">↗</span></a><a href="#platform" class="textButton">Discover the platform <span aria-hidden="true">→</span></a></div><span class="scrollPrompt">SCROLL TO EXPLORE <b>↓</b></span></div></div>
+    </section>
+
+    <section class="introBand"><span>01 / THE PLATFORM</span><p>Security work moves fast. Chrontinal brings the event stream, investigations, AI assistance, and evidence into a connected workspace.</p><span class="introSpark" aria-hidden="true">✦</span></section>
+
+    <section class="platform" id="platform"><div class="sectionHeading"><p class="eyebrow">/ BUILT FOR THE FULL PICTURE</p><h2>ABOUT<br><span>/ THE SOC</span></h2><p>Move through the security workflow without losing the context behind a decision.</p></div><div class="capabilityGrid">
+      <a href="#live-app" data-app-path="/live-feed" class="capabilityCard"><div class="cardTop"><span>01 / 06</span><span aria-hidden="true">↗</span></div><div class="cardIcon"><span aria-hidden="true">◉</span></div><h3>Live feed</h3><p>Follow incoming security events from one focused view.</p></a>
+      <a href="#live-app" data-app-path="/alerts" class="capabilityCard"><div class="cardTop"><span>02 / 06</span><span aria-hidden="true">↗</span></div><div class="cardIcon"><span aria-hidden="true">◇</span></div><h3>Alert triage</h3><p>Prioritize signals and move from alert to investigation.</p></a>
+      <a href="#live-app" data-app-path="/attack-graph" class="capabilityCard"><div class="cardTop"><span>03 / 06</span><span aria-hidden="true">↗</span></div><div class="cardIcon"><span aria-hidden="true">⌘</span></div><h3>Attack graph</h3><p>See relationships between entities, events, and threats.</p></a>
+      <a href="#live-app" data-app-path="/investigations" class="capabilityCard"><div class="cardTop"><span>04 / 06</span><span aria-hidden="true">↗</span></div><div class="cardIcon"><span aria-hidden="true">⌕</span></div><h3>Investigations</h3><p>Bring evidence, context, and response into one workflow.</p></a>
+      <a href="#live-app" data-app-path="/ai-agents" class="capabilityCard"><div class="cardTop"><span>05 / 06</span><span aria-hidden="true">↗</span></div><div class="cardIcon"><span aria-hidden="true">✧</span></div><h3>AI assistance</h3><p>Explore assisted analysis and explainable results.</p></a>
+      <a href="#live-app" data-app-path="/reports" class="capabilityCard"><div class="cardTop"><span>06 / 06</span><span aria-hidden="true">↗</span></div><div class="cardIcon"><span aria-hidden="true">▤</span></div><h3>Reports & evidence</h3><p>Keep findings organized and ready to share.</p></a>
+    </div></section>
+
+    <section class="workflow" id="workflow"><div class="workflowGlow"></div><div class="workflowLead"><p class="eyebrow">02 / FROM NOISE TO KNOWLEDGE</p><h2>SEE THE<br><span>WHOLE STORY.</span></h2><p>Follow a signal from the moment it appears to the evidence and explanation behind your next move.</p><a href="#live-app" data-app-path="/investigations" class="primaryButton">Start investigating <span aria-hidden="true">↗</span></a></div><div class="workflowSteps"><div><span>01</span><b aria-hidden="true">◉</b><h3>Detect</h3><p>See events and alerts as they arrive.</p></div><div><span>02</span><b aria-hidden="true">◇</b><h3>Connect</h3><p>Follow relationships and add context.</p></div><div><span>03</span><b aria-hidden="true">✓</b><h3>Resolve</h3><p>Document findings and preserve evidence.</p></div></div></section>
+
+    <section class="modules" id="modules"><div class="modulesIntro"><p class="eyebrow">03 / EXPLORE YOUR WORKSPACE</p><h2>ONE PLATFORM.<br><span>EVERY ANGLE.</span></h2><p>Open the tools you need, right where the work happens.</p><span class="miniOrb" aria-hidden="true"></span></div><div class="moduleList">
+      <a href="#live-app" data-app-path="/dashboard" class="moduleRow"><span class="moduleNumber">01</span><span class="moduleName">Security dashboard<small>Your operational view</small></span><span aria-hidden="true">↗</span></a>
+      <a href="#live-app" data-app-path="/threat-intel" class="moduleRow"><span class="moduleNumber">02</span><span class="moduleName">Threat intelligence<small>Context around emerging risks</small></span><span aria-hidden="true">↗</span></a>
+      <a href="#live-app" data-app-path="/search" class="moduleRow"><span class="moduleNumber">03</span><span class="moduleName">Semantic search<small>Find related events faster</small></span><span aria-hidden="true">↗</span></a>
+      <a href="#live-app" data-app-path="/chain-of-custody" class="moduleRow"><span class="moduleNumber">04</span><span class="moduleName">Chain of custody<small>Track evidence integrity</small></span><span aria-hidden="true">↗</span></a>
+    </div></section>
+
+    <section class="finalCta" id="live-app"><div class="ctaOrb" aria-hidden="true"></div><p class="eyebrow">/ READY WHEN YOU ARE</p><h2>MAKE YOUR<br><span>NEXT MOVE</span><br>COUNT.</h2><p>Bring clarity to every signal and confidence to every response.</p><div class="ctaActions"><a href="#live-app" data-app-path="/login" class="primaryButton">Open live dashboard <span aria-hidden="true">↗</span></a></div><p class="connectionNote" id="connection-note">The interactive SOC runs as a separate live app. Its link will appear here when configured.</p></section>
+  </main>
+  <footer class="footer"><a href="#overview" class="footerBrand">CHRON<span>TINAL</span> <small>SOC</small></a><span>Security operations, connected.</span><a href="#live-app" data-app-path="/login">LIVE DASHBOARD <span aria-hidden="true">↗</span></a></footer>
+</div>
+</body>
+</html>

@@ -36,9 +36,9 @@ data:
           port: 8123
           protocol: http
           defaultDatabase: clif_logs
-          username: clif_admin
+          username: $CLICKHOUSE_USER
         secureJsonData:
-          password: "${CLICKHOUSE_PASSWORD}"
+          password: $CLICKHOUSE_PASSWORD
 
   grafana-dashboards.yml: |
     apiVersion: 1

@@ -74,7 +74,7 @@ BROKER = os.getenv("BROKER", "localhost:19092,localhost:29092,localhost:39092")
 CH_HOST = os.getenv("CH_HOST", "localhost")
 CH_PORT = int(os.getenv("CH_PORT", "9000"))
 CH_USER = os.getenv("CH_USER", "clif_admin")
-CH_PASS = os.getenv("CH_PASS", "Cl1f_Ch@ngeM3_2026!")
+CH_PASS = os.getenv("CH_PASS", os.getenv("CLICKHOUSE_PASSWORD", ""))
 CH_DB = os.getenv("CH_DB", "clif_logs")
 
 PRODUCER_CONFIG = {

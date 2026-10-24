@@ -7,6 +7,8 @@ Produce benchmark report.
 Usage:
   python3 /opt/clif/benchmark_real.py [--workers 8] [--file /opt/clif/real_2m_payload.ndjson]
 """
+import os
+import urllib.parse
 import socket, time, threading, urllib.request, json, sys, os
 from datetime import datetime, timezone
 from collections import defaultdict
@@ -17,7 +19,7 @@ VECTOR_PORT = 9514
 WORKERS = 8
 CHUNK_LINES = 500
 FILE = "/opt/clif/real_2m_payload.ndjson"
-CH_URL = "http://localhost:8123/?user=clif_admin&password=Cl1f_Ch%40ngeM3_2026!&database=clif_logs"
+CH_URL = ("http://localhost:8123/?" + urllib.parse.urlencode({"user": os.getenv("CLICKHOUSE_USER", "clif_admin"), "password": os.environ["CLICKHOUSE_PASSWORD"], "database": os.getenv("CLICKHOUSE_DB", "clif_logs")}))
 
 # Parse CLI args
 for i, a in enumerate(sys.argv[1:], 1):

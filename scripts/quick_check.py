@@ -1,9 +1,10 @@
 """Quick check of triage results."""
+import os
 import clickhouse_connect, sys
 
 c = clickhouse_connect.get_client(
     host="10.52.166.221", port=8123,
-    username="clif_admin", password="Cl1f_Ch@ngeM3_2026!",
+    username="clif_admin", password=os.environ["CLICKHOUSE_PASSWORD"],
     database="clif_logs",
 )
 mins = int(sys.argv[1]) if len(sys.argv) > 1 else 3

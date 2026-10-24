@@ -26,6 +26,8 @@ if (-not $DataIP) {
 }
 
 $pass = 0; $fail = 0; $warn = 0
+$chUser = if ($env:CLICKHOUSE_USER) { $env:CLICKHOUSE_USER } else { "clif_admin" }
+$chPassword = $env:CLICKHOUSE_PASSWORD
 
 function Test-Endpoint {
     param([string]$Name, [string]$Host, [int]$Port, [string]$HttpPath)
@@ -79,9 +81,10 @@ if ($Role -in "pc1","all") {
 
     # Quick ClickHouse query
     try {
-        $chUser = "clif_admin"
+        if (-not $chPassword) { throw "CLICKHOUSE_PASSWORD is required for query checks" }
         $body = "SELECT count() FROM clif_logs.raw_events"
-        $resp = Invoke-WebRequest -Uri "http://${DataIP}:8123/?user=$chUser&password=Cl1f_Ch%40ngeM3_2026!" `
+        $query = "user=$([uri]::EscapeDataString($chUser))&password=$([uri]::EscapeDataString($chPassword))"
+        $resp = Invoke-WebRequest -Uri "http://${DataIP}:8123/?$query" `
             -Method POST -Body $body -TimeoutSec 5 -UseBasicParsing 2>$null
         $count = $resp.Content.Trim()
         Write-Host "  OK    ClickHouse query: $count events in raw_events" -ForegroundColor Green
@@ -148,7 +151,9 @@ if ($Role -eq "all") {
         Start-Sleep -Seconds 5
 
         $body = "SELECT count() FROM clif_logs.raw_events WHERE host_name = 'health-check' AND event_time > now() - INTERVAL 30 SECOND"
-        $resp = Invoke-WebRequest -Uri "http://${DataIP}:8123/?user=clif_admin&password=Cl1f_Ch%40ngeM3_2026!" `
+        if (-not $chPassword) { throw "CLICKHOUSE_PASSWORD is required for query checks" }
+        $query = "user=$([uri]::EscapeDataString($chUser))&password=$([uri]::EscapeDataString($chPassword))"
+        $resp = Invoke-WebRequest -Uri "http://${DataIP}:8123/?$query" `
             -Method POST -Body $body -TimeoutSec 5 -UseBasicParsing 2>$null
         $hitCount = [int]$resp.Content.Trim()
         if ($hitCount -gt 0) {

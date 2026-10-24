@@ -43,13 +43,16 @@ interface ChatMessage {
 }
 
 const QUICK_PROMPTS = [
-  { label: "Summarize alerts", icon: AlertTriangle, prompt: "Summarize the current critical and high severity alerts" },
-  { label: "Top threats", icon: Shield, prompt: "What are the top active threats in the last 24 hours?" },
-  { label: "Investigate IOC", icon: Search, prompt: "Investigate this IOC and check for related activity" },
-  { label: "MITRE mapping", icon: Crosshair, prompt: "Map recent attacks to MITRE ATT&CK techniques" },
-  { label: "Pipeline status", icon: Brain, prompt: "What is the current status of the AI pipeline (Triage → Hunter → Verifier)?" },
-  { label: "Evidence integrity", icon: ShieldCheck, prompt: "Check the integrity of recent evidence batches and HMAC chains" },
+  { label: "Summarize an alert", icon: AlertTriangle, prompt: "Help me summarize a security alert. I can provide its details." },
+  { label: "Threat priorities", icon: Shield, prompt: "Which threat patterns should a SOC analyst prioritize today?" },
+  { label: "Investigate an IOC", icon: Search, prompt: "How should I investigate a suspicious IP address?" },
+  { label: "MITRE mapping", icon: Crosshair, prompt: "How can I map an event to a MITRE ATT&CK technique?" },
+  { label: "Pipeline overview", icon: Brain, prompt: "Explain how triage, hunting, and verification fit together." },
+  { label: "Evidence integrity", icon: ShieldCheck, prompt: "How should I verify the integrity of a security evidence batch?" },
 ];
+
+const CHAT_DISCLOSURE =
+  "Chat prompts and recent conversation history are sent to Groq for a response. This chat does not automatically read SOC events or pipeline status; include the details you want analyzed.";
 
 interface Conversation {
   id: string;
@@ -63,8 +66,7 @@ export default function ChatPage() {
     {
       id: "welcome",
       role: "system",
-      content:
-        "Chrontinal AI Assistant initialized. I can help you investigate security events, analyze threats, search the knowledge base, and provide recommendations based on your SOC data.\n\nI have access to your 3-agent AI pipeline (Triage → Hunter → Verifier), ClickHouse event store, and LanceDB vector search.",
+      content: CHAT_DISCLOSURE,
       timestamp: new Date(),
     },
   ]);
@@ -87,10 +89,17 @@ export default function ChatPage() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const handleSubmit = async (e?: FormEvent) => {
+  const handleSubmit = async (e?: FormEvent, override?: string) => {
     e?.preventDefault();
-    const trimmed = input.trim();
+    const trimmed = (override ?? input).trim();
     if (!trimmed || isLoading) return;
+    const history = messages
+      .filter((msg) => msg.role === "user" || msg.role === "assistant")
+      .slice(-12)
+      .map((msg) => ({ role: msg.role, content: msg.content }));
+    while (history.reduce((length, turn) => length + turn.content.length, 0) > 12_000) {
+      history.shift();
+    }
 
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(),
@@ -106,12 +115,11 @@ export default function ChatPage() {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed }),
+        body: JSON.stringify({ message: trimmed, history }),
       });
 
-      if (!res.ok) throw new Error(`Chat API error: ${res.status}`);
-
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Chat API error: ${res.status}`);
 
       const assistantMsg: ChatMessage = {
         id: crypto.randomUUID(),
@@ -126,14 +134,13 @@ export default function ChatPage() {
         },
       };
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch {
+    } catch (error) {
       setMessages((prev) => [
         ...prev,
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          content:
-            "I encountered an error processing your request. The AI backend may be unavailable. Please try again.",
+          content: error instanceof Error ? error.message : "Chat is temporarily unavailable. Please try again.",
           timestamp: new Date(),
         },
       ]);
@@ -144,12 +151,7 @@ export default function ChatPage() {
   };
 
   const handleQuickPrompt = (prompt: string) => {
-    setInput(prompt);
-    setTimeout(() => {
-      const syntheticEvent = { preventDefault: () => {} } as FormEvent;
-      setInput(prompt);
-      handleSubmit(syntheticEvent);
-    }, 50);
+    void handleSubmit(undefined, prompt);
   };
 
   const handleCopy = (content: string) => {
@@ -161,7 +163,7 @@ export default function ChatPage() {
       {
         id: "welcome",
         role: "system",
-        content: "Chat cleared. How can I help you?",
+        content: CHAT_DISCLOSURE,
         timestamp: new Date(),
       },
     ]);
@@ -347,6 +349,7 @@ export default function ChatPage() {
             <textarea
               ref={inputRef}
               value={input}
+              maxLength={4000}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask Chrontinal AI about security events, threats, investigations..."
@@ -370,6 +373,9 @@ export default function ChatPage() {
             )}
           </Button>
         </form>
+        <p className="mx-auto mt-2 max-w-3xl text-xs text-muted-foreground">
+          Your prompt and recent chat history are sent to Groq. SOC telemetry is not included automatically.
+        </p>
       </div>
       </div>
     </div>

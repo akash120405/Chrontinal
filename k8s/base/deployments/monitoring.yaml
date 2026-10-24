@@ -171,6 +171,16 @@ spec:
                 secretKeyRef:
                   name: clif-credentials
                   key: GRAFANA_ADMIN_PASSWORD
+            - name: CLICKHOUSE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: clif-credentials
+                  key: CLICKHOUSE_USER
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clif-credentials
+                  key: CLICKHOUSE_PASSWORD
             - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
               value: /var/lib/grafana/dashboards/clif-overview.json
           volumeMounts:

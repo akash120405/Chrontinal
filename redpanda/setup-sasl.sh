@@ -10,6 +10,9 @@ set -euo pipefail
 
 BROKER="${1:-localhost:19092}"
 ADMIN_URL="${2:-http://localhost:9644}"
+: "${REDPANDA_ADMIN_PASSWORD:?Set REDPANDA_ADMIN_PASSWORD before creating SASL users}"
+: "${REDPANDA_CONSUMER_PASSWORD:?Set REDPANDA_CONSUMER_PASSWORD before creating SASL users}"
+: "${REDPANDA_PRODUCER_PASSWORD:?Set REDPANDA_PRODUCER_PASSWORD before creating SASL users}"
 
 echo "╔═══════════════════════════════════════════════════════════╗"
 echo "║  CLIF — Redpanda SASL/SCRAM User Setup                  ║"
@@ -18,21 +21,21 @@ echo "╚═══════════════════════�
 # Create superuser for admin operations
 echo "Creating superuser: clif_admin..."
 rpk acl user create clif_admin \
-  --password "${REDPANDA_ADMIN_PASSWORD:-Cl1f_Rp@dmin_2026!}" \
+  --password "${REDPANDA_ADMIN_PASSWORD}" \
   --mechanism SCRAM-SHA-256 \
   --api-urls "${ADMIN_URL}" 2>/dev/null || echo "  (already exists)"
 
 # Create consumer user
 echo "Creating user: clif_consumer..."
 rpk acl user create clif_consumer \
-  --password "${REDPANDA_CONSUMER_PASSWORD:-Cl1f_C0nsumer_2026!}" \
+  --password "${REDPANDA_CONSUMER_PASSWORD}" \
   --mechanism SCRAM-SHA-256 \
   --api-urls "${ADMIN_URL}" 2>/dev/null || echo "  (already exists)"
 
 # Create producer user (for triage, hunter, vector)
 echo "Creating user: clif_producer..."
 rpk acl user create clif_producer \
-  --password "${REDPANDA_PRODUCER_PASSWORD:-Cl1f_Pr0ducer_2026!}" \
+  --password "${REDPANDA_PRODUCER_PASSWORD}" \
   --mechanism SCRAM-SHA-256 \
   --api-urls "${ADMIN_URL}" 2>/dev/null || echo "  (already exists)"
 

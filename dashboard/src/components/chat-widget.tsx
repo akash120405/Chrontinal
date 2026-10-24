@@ -21,14 +21,16 @@ interface ChatMessage {
   timestamp: Date;
 }
 
+const CHAT_DISCLOSURE =
+  "Prompts and recent chat history are sent to Groq. This chat does not automatically access live SOC events or pipeline status.";
+
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
       role: "system",
-      content:
-        "Chrontinal AI Assistant ready. Ask me about security events, threats, investigations, or pipeline status.",
+      content: CHAT_DISCLOSURE,
       timestamp: new Date(),
     },
   ]);
@@ -55,6 +57,13 @@ export function ChatWidget() {
     e?.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
+    const history = messages
+      .filter((msg) => msg.role === "user" || msg.role === "assistant")
+      .slice(-12)
+      .map((msg) => ({ role: msg.role, content: msg.content }));
+    while (history.reduce((length, turn) => length + turn.content.length, 0) > 12_000) {
+      history.shift();
+    }
 
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(),
@@ -70,11 +79,11 @@ export function ChatWidget() {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed }),
+        body: JSON.stringify({ message: trimmed, history }),
       });
 
-      if (!res.ok) throw new Error(`Chat API error: ${res.status}`);
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Chat API error: ${res.status}`);
 
       setMessages((prev) => [
         ...prev,
@@ -85,13 +94,13 @@ export function ChatWidget() {
           timestamp: new Date(),
         },
       ]);
-    } catch {
+    } catch (error) {
       setMessages((prev) => [
         ...prev,
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: "I encountered an error. The AI backend may be unavailable. Please try again.",
+          content: error instanceof Error ? error.message : "Chat is temporarily unavailable. Please try again.",
           timestamp: new Date(),
         },
       ]);
@@ -106,7 +115,7 @@ export function ChatWidget() {
       {
         id: "welcome",
         role: "system",
-        content: "Chat cleared. How can I help you?",
+        content: CHAT_DISCLOSURE,
         timestamp: new Date(),
       },
     ]);
@@ -143,9 +152,7 @@ export function ChatWidget() {
               </div>
               <div>
                 <h3 className="text-sm font-extrabold text-foreground">Chrontinal AI</h3>
-                <p className="text-[10px] text-emerald-500 font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Online
-                </p>
+                <p className="text-[10px] text-muted-foreground font-bold">Groq powered chat</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -215,6 +222,7 @@ export function ChatWidget() {
               <textarea
                 ref={inputRef}
                 value={input}
+                maxLength={4000}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask Chrontinal AI..."
@@ -235,6 +243,9 @@ export function ChatWidget() {
                 )}
               </button>
             </form>
+            <p className="mt-2 text-[10px] leading-snug text-muted-foreground">
+              Prompt and recent history go to Groq. Live SOC data is not included automatically.
+            </p>
           </div>
         </div>
       )}

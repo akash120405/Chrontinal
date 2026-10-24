@@ -1,10 +1,11 @@
 """Detailed results check."""
+import os
 import urllib.request, urllib.parse
 
 def q(sql):
     params = urllib.parse.urlencode({
         'user': 'clif_admin',
-        'password': 'Cl1f_Ch@ngeM3_2026!',
+        'password': os.environ["CLICKHOUSE_PASSWORD"],
         'database': 'clif_logs',
         'query': sql,
     })

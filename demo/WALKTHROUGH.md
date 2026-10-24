@@ -84,10 +84,10 @@ A pre-built payload of 2 million realistic log events (528 MB) is stored on the 
 
 ```bash
 # Run full 2M benchmark with live streaming (default 16 workers)
-curl "http://35.200.152.225:9515/benchmark?key=clif-bench-2026"
+curl "http://35.200.152.225:9515/benchmark?key=${BENCHMARK_API_KEY}"
 
 # Custom worker count
-curl "http://35.200.152.225:9515/benchmark?key=clif-bench-2026&workers=8"
+curl "http://35.200.152.225:9515/benchmark?key=${BENCHMARK_API_KEY}&workers=8"
 
 # Health check (no key required)
 curl http://35.200.152.225:9515/health
@@ -99,7 +99,7 @@ curl http://35.200.152.225:9515/health
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `key` | *(required)* | API key — `clif-bench-2026` |
+| `key` | *(required)* | API key supplied through `BENCHMARK_API_KEY` |
 | `workers` | `16` | Number of parallel TCP connections (1–64) |
 
 ### What You'll See
@@ -243,7 +243,7 @@ python demo/securebank/attack.py --target http://35.200.152.225:5000/bank
 
 ```bash
 # Benchmark — streams 2M events with live progress (~60 seconds)
-curl "http://35.200.152.225:9515/benchmark?key=clif-bench-2026"
+curl "http://35.200.152.225:9515/benchmark?key=${BENCHMARK_API_KEY}"
 
 # Attack demo — interactive mode (pauses between phases)
 python demo/securebank/attack.py --interactive

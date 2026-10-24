@@ -1,4 +1,6 @@
 """Benchmark ClickHouse queries used by the dashboard to find slow ones."""
+import os
+import urllib.parse
 import urllib.request, json, time
 
 queries = {
@@ -63,7 +65,7 @@ queries = {
         FROM clif_logs.evidence_anchors""",
 }
 
-url_base = "http://localhost:8123/?database=clif_logs&default_format=JSON&user=clif_admin&password=Cl1f_Ch%40ngeM3_2026!"
+url_base = ("http://localhost:8123/?" + urllib.parse.urlencode({"database": os.getenv("CLICKHOUSE_DB", "clif_logs"), "default_format": "JSON", "user": os.getenv("CLICKHOUSE_USER", "clif_admin"), "password": os.environ["CLICKHOUSE_PASSWORD"]}))
 
 print(f"{'Query':<25} {'Time':>8} {'Rows Read':>12} {'Result':>8}")
 print("-" * 60)

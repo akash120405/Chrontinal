@@ -10,6 +10,7 @@
      steel-blue accents · barely-there borders · soft shadows
      ═══════════════════════════════════════════════════════════ */
   :root {
+    --font-inter: "Segoe UI";
     /* Surface & type */
     --background: 218 24% 96%;
     /* warm ivory-white canvas     */

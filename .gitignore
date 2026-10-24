@@ -4,6 +4,7 @@
 .env.production
 .env.gcp
 .env.gcp-2node
+k8s/base/secrets/credentials.env
 cluster/.env
 cluster/.env.pc2
 dashboard/.env.local

@@ -12,6 +12,7 @@ Usage:
     python performance_test.py [--events 1000000] [--rate 100000] [--duration 600]
 """
 
+import os
 from __future__ import annotations
 
 import argparse
@@ -40,7 +41,7 @@ parser.add_argument("--kafka-broker", default="localhost:19092", help="Redpanda 
 parser.add_argument("--ch-host", default="localhost", help="ClickHouse host")
 parser.add_argument("--ch-port", type=int, default=8123, help="ClickHouse HTTP port")
 parser.add_argument("--ch-user", default="clif_admin")
-parser.add_argument("--ch-password", default="Cl1f_Ch@ngeM3_2026!")
+parser.add_argument("--ch-password", default=os.getenv("CLICKHOUSE_PASSWORD", ""))
 parser.add_argument("--ch-db", default="clif_logs")
 args = parser.parse_args()
 

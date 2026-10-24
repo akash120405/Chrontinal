@@ -1,4 +1,5 @@
 """Debug a specific batch's hash mismatch."""
+import os
 import hashlib
 import json
 import math
@@ -6,7 +7,7 @@ import urllib.request
 
 CH_URL = "http://10.52.166.221:8123/"
 CH_USER = "clif_admin"
-CH_PASS = "Cl1f_Ch@ngeM3_2026!"
+CH_PASS = os.environ["CLICKHOUSE_PASSWORD"]
 CH_DB = "clif_logs"
 
 def ch_query(sql):

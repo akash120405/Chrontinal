@@ -66,7 +66,8 @@ k8s/
 │   │   ├── prometheus.yaml             # Scrape config
 │   │   └── redpanda-console.yaml       # Broker config
 │   ├── secrets/
-│   │   └── credentials.yaml            # ClickHouse, MinIO, Grafana creds
+│   │   ├── credentials.env.example      # Non-secret template
+│   │   └── credentials.env              # Local only; ignored by Git
 │   ├── statefulsets/
 │   │   ├── redpanda.yaml               # 3-node Kafka-compatible streaming
 │   │   ├── clickhouse.yaml             # 2-node replicated analytics DB
@@ -100,6 +101,16 @@ k8s/
 - Kubernetes 1.28+ cluster (AKS, EKS, GKE, or K3s)
 - `kubectl` v1.28+
 - Container registry with CLIF images (see Image Build section)
+
+### Credentials
+
+Before either deployment, copy `k8s/base/secrets/credentials.env.example` to
+`k8s/base/secrets/credentials.env` and replace every placeholder with a unique
+password. The local file is ignored by Git. Kustomize generates the
+`clif-credentials` Kubernetes Secret from it. The old fixed passwords in
+`credentials.yaml` were exposed in source; if they were used anywhere, rotate
+them before deployment. Do not commit generated manifests containing the
+Secret or share `kubectl kustomize` output.
 
 ### Quick Deploy (Development)
 ```bash

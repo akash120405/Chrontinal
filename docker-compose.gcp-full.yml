@@ -59,7 +59,7 @@ x-triage-env: &triage-env
   CLICKHOUSE_HOST: clickhouse01
   CLICKHOUSE_PORT: 9000
   CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
-  CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me}
+  CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
   CLICKHOUSE_DB: ${CLICKHOUSE_DB:-clif_logs}
   # ── v8 Models (2-model ensemble: LightGBM + Autoencoder)
   MODEL_DIR: /models
@@ -193,7 +193,7 @@ x-hunter-env: &hunter-env
   CLICKHOUSE_HOST: clickhouse01
   CLICKHOUSE_PORT: 8123
   CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
-  CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me}
+  CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
   CLICKHOUSE_DATABASE: ${CLICKHOUSE_DB:-clif_logs}
   LANCEDB_URL: "http://lancedb:8100"
   LANCEDB_TIMEOUT_SEC: "5.0"
@@ -256,13 +256,13 @@ services:
     container_name: clif-vector
     hostname: clif-vector
     ports:
-      - "1514:1514"           # Syslog TCP
-      - "1514:1514/udp"       # Syslog UDP
-      - "8686:8686"           # Vector API
-      - "8687:8687"           # HTTP JSON ingest
-      - "9514:9514"           # TCP NDJSON
-      - "8125:8125/udp"       # StatsD metrics
-      - "9598:9598"           # Prometheus exporter
+      - "${VECTOR_INGEST_BIND_IP:-0.0.0.0}:1514:1514"           # Syslog TCP
+      - "${VECTOR_INGEST_BIND_IP:-0.0.0.0}:1514:1514/udp"       # Syslog UDP
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8686:8686"           # Vector API
+      - "${VECTOR_INGEST_BIND_IP:-0.0.0.0}:8687:8687"           # HTTP JSON ingest
+      - "${VECTOR_INGEST_BIND_IP:-0.0.0.0}:9514:9514"           # TCP NDJSON
+      - "${VECTOR_INGEST_BIND_IP:-0.0.0.0}:8125:8125/udp"       # StatsD metrics
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9598:9598"           # Prometheus exporter
     environment:
       VECTOR_KAFKA_BROKERS: "redpanda01:9092,redpanda02:9092,redpanda03:9092"
       VECTOR_LOG: ${VECTOR_LOG_LEVEL:-info}
@@ -299,7 +299,7 @@ services:
     container_name: clif-clickhouse-keeper
     hostname: clickhouse-keeper
     ports:
-      - "12181:2181"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:12181:2181"
     volumes:
       - clickhouse_keeper_data:/var/lib/clickhouse-keeper
       - ./clickhouse/keeper_config.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
@@ -330,12 +330,12 @@ services:
     container_name: clif-clickhouse01
     hostname: clickhouse01
     ports:
-      - "8123:8123"           # HTTP
-      - "9000:9000"           # Native
-      - "9363:9363"           # Prometheus metrics
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8123:8123"           # HTTP
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9000:9000"           # Native
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9363:9363"           # Prometheus metrics
     environment:
       CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
       CLICKHOUSE_DB: ${CLICKHOUSE_DB:-clif_logs}
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     volumes:
@@ -352,7 +352,7 @@ services:
     networks:
       - clif-net
     healthcheck:
-      test: ["CMD-SHELL", "clickhouse-client --user ${CLICKHOUSE_USER:-clif_admin} --password ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me} --query 'SELECT 1'"]
+      test: ["CMD-SHELL", "clickhouse-client --user \"$$CLICKHOUSE_USER\" --password \"$$CLICKHOUSE_PASSWORD\" --query 'SELECT 1'"]
       interval: 60s
       timeout: 5s
       retries: 5
@@ -380,12 +380,12 @@ services:
     container_name: clif-clickhouse02
     hostname: clickhouse02
     ports:
-      - "8124:8123"           # HTTP
-      - "9001:9000"           # Native
-      - "9364:9363"           # Prometheus metrics
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8124:8123"           # HTTP
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9001:9000"           # Native
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9364:9363"           # Prometheus metrics
     environment:
       CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
       CLICKHOUSE_DB: ${CLICKHOUSE_DB:-clif_logs}
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     volumes:
@@ -402,7 +402,7 @@ services:
     networks:
       - clif-net
     healthcheck:
-      test: ["CMD-SHELL", "clickhouse-client --user ${CLICKHOUSE_USER:-clif_admin} --password ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me} --query 'SELECT 1'"]
+      test: ["CMD-SHELL", "clickhouse-client --user \"$$CLICKHOUSE_USER\" --password \"$$CLICKHOUSE_PASSWORD\" --query 'SELECT 1'"]
       interval: 60s
       timeout: 5s
       retries: 5
@@ -445,9 +445,9 @@ services:
       - --default-log-level=warn
       - --seeds redpanda01:33145
     ports:
-      - "19092:19092"         # Kafka external
-      - "18082:18082"         # Pandaproxy external
-      - "9644:9644"           # Admin API / metrics
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:19092:19092"         # Kafka external
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:18082:18082"         # Pandaproxy external
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9644:9644"           # Admin API / metrics
     volumes:
       - redpanda01_data:/var/lib/redpanda/data
     networks:
@@ -492,9 +492,9 @@ services:
       - --default-log-level=warn
       - --seeds redpanda01:33145
     ports:
-      - "29092:29092"         # Kafka external
-      - "28082:28082"         # Pandaproxy external
-      - "9645:9644"           # Admin API
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:29092:29092"         # Kafka external
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:28082:28082"         # Pandaproxy external
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9645:9644"           # Admin API
     volumes:
       - redpanda02_data:/var/lib/redpanda/data
     networks:
@@ -542,9 +542,9 @@ services:
       - --default-log-level=warn
       - --seeds redpanda01:33145
     ports:
-      - "39092:39092"         # Kafka external
-      - "38082:38082"         # Pandaproxy external
-      - "9646:9644"           # Admin API
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:39092:39092"         # Kafka external
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:38082:38082"         # Pandaproxy external
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9646:9644"           # Admin API
     volumes:
       - redpanda03_data:/var/lib/redpanda/data
     networks:
@@ -578,11 +578,11 @@ services:
     hostname: minio1
     command: server /data --console-address ":9001"
     ports:
-      - "9002:9000"           # S3 API
-      - "9003:9001"           # MinIO Console
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9002:9000"           # S3 API
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9003:9001"           # MinIO Console
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-clif_minio_admin}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-clif_minio_secret_change_me}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
       MINIO_PROMETHEUS_AUTH_TYPE: public
       MINIO_API_REQUESTS_MAX: "0"
     volumes:
@@ -624,7 +624,7 @@ services:
       "
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-clif_minio_admin}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-clif_minio_secret_change_me}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
     networks:
       - clif-net
 
@@ -748,7 +748,7 @@ services:
       CLICKHOUSE_ALT_HOSTS: clickhouse02:9000
       CLICKHOUSE_PORT: 9000
       CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
       CLICKHOUSE_DB: ${CLICKHOUSE_DB:-clif_logs}
       CONSUMER_GROUP_ID: ${CONSUMER_GROUP_ID:-clif-clickhouse-consumer}
       CONSUMER_BATCH_SIZE: ${CONSUMER_BATCH_SIZE:-50000}
@@ -799,7 +799,7 @@ services:
       CLICKHOUSE_ALT_HOSTS: clickhouse02:9000
       CLICKHOUSE_PORT: 9000
       CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
       CLICKHOUSE_DB: ${CLICKHOUSE_DB:-clif_logs}
       CONSUMER_GROUP_ID: ${CONSUMER_GROUP_ID:-clif-clickhouse-consumer}
       CONSUMER_BATCH_SIZE: ${CONSUMER_BATCH_SIZE:-50000}
@@ -849,7 +849,7 @@ services:
     volumes:
       - ./agents/triage/models:/models:ro
     ports:
-      - "8300:8300"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8300:8300"
     networks:
       - clif-net
     healthcheck: *triage-healthcheck
@@ -868,7 +868,7 @@ services:
     volumes:
       - ./agents/triage/models:/models:ro
     ports:
-      - "8301:8300"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8301:8300"
     networks:
       - clif-net
     healthcheck: *triage-healthcheck
@@ -887,7 +887,7 @@ services:
     volumes:
       - ./agents/triage/models:/models:ro
     ports:
-      - "8302:8300"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8302:8300"
     networks:
       - clif-net
     healthcheck: *triage-healthcheck
@@ -906,7 +906,7 @@ services:
     volumes:
       - ./agents/triage/models:/models:ro
     ports:
-      - "8303:8300"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8303:8300"
     networks:
       - clif-net
     healthcheck: *triage-healthcheck
@@ -933,7 +933,7 @@ services:
     volumes:
       - hunter_models:/app/models
     ports:
-      - "8400:8400"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8400:8400"
     networks:
       - clif-net
     healthcheck: *hunter-healthcheck
@@ -962,7 +962,7 @@ services:
     volumes:
       - hunter_models:/app/models
     ports:
-      - "8401:8400"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8401:8400"
     networks:
       - clif-net
     healthcheck: *hunter-healthcheck
@@ -1000,12 +1000,12 @@ services:
       KAFKA_MAX_POLL_RECORDS: "200"
       VERIFIER_CONCURRENCY: "20"
       DEDUP_WINDOW_SEC: "30"
-      CLIF_HMAC_KEY: ${CLIF_HMAC_KEY:-clif-default-hmac-key-change-me}
+      CLIF_HMAC_KEY: ${CLIF_HMAC_KEY:?Set CLIF_HMAC_KEY in .env}
       REQUIRE_HMAC: "false"
       CLICKHOUSE_HOST: clickhouse01
       CLICKHOUSE_PORT: 8123
       CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
       CLICKHOUSE_DATABASE: ${CLICKHOUSE_DB:-clif_logs}
       LANCEDB_URL: "http://lancedb:8100"
       LANCEDB_TIMEOUT_SEC: "5.0"
@@ -1017,7 +1017,7 @@ services:
       EVIDENCE_LOOKBACK_HOURS: "2"
       LOG_LEVEL: INFO
     ports:
-      - "8500:8500"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8500:8500"
     networks:
       - clif-net
     healthcheck:
@@ -1058,7 +1058,7 @@ services:
       XAI_PORT: "8200"
       LOG_LEVEL: INFO
     ports:
-      - "8200:8200"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8200:8200"
     volumes:
       - ./agents/triage/models:/models:ro
     networks:
@@ -1093,11 +1093,11 @@ services:
       CLICKHOUSE_HOST: clickhouse01
       CLICKHOUSE_PORT: 9000
       CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
       CLICKHOUSE_DB: ${CLICKHOUSE_DB:-clif_logs}
       MINIO_ENDPOINT: "http://minio1:9000"
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-clif_minio_admin}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-clif_minio_secret_change_me}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
       MINIO_BUCKET_EVIDENCE: ${MINIO_BUCKET_EVIDENCE:-clif-evidence-archive}
       MERKLE_BATCH_WINDOW: ${MERKLE_BATCH_WINDOW:-1800}
       MERKLE_DAEMON_INTERVAL: ${MERKLE_DAEMON_INTERVAL:-30}
@@ -1137,7 +1137,7 @@ services:
       CLICKHOUSE_HOST: clickhouse01
       CLICKHOUSE_PORT: 9000
       CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
       CLICKHOUSE_DB: ${CLICKHOUSE_DB:-clif_logs}
       SYNC_INTERVAL_SEC: 30
       SYNC_BATCH_SIZE: 1000
@@ -1146,7 +1146,7 @@ services:
       LOG_LEVEL: INFO
       CORS_ORIGINS: "http://localhost:3001,http://clif-dashboard:3001,http://${GCP_EXTERNAL_IP:-localhost}:3001"
     ports:
-      - "8100:8100"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8100:8100"
     volumes:
       - lancedb_data:/data/lancedb
     networks:
@@ -1178,19 +1178,25 @@ services:
     container_name: clif-dashboard
     hostname: clif-dashboard
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"  # Public traffic enters through the HTTPS reverse proxy.
     environment:
       NODE_ENV: production
       PORT: "3001"
       CH_HOST: clickhouse01
       CH_PORT: "8123"
       CH_USER: ${CLICKHOUSE_USER:-clif_admin}
-      CH_PASSWORD: ${CLICKHOUSE_PASSWORD:-clif_secure_password_change_me}
+      CH_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
       SECUREBANK_URL: http://securebank-web01:5000
       REDPANDA_ADMIN_URL: http://redpanda01:9644
       PROMETHEUS_URL: http://prometheus:9090
       LANCEDB_URL: http://lancedb:8100
       AI_SERVICE_URL: http://clif-xai-service:8200
+      GROQ_API_KEY: ${GROQ_API_KEY:?Set GROQ_API_KEY in .env}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-20b}
+      CLIF_AUTH_USER: ${CLIF_AUTH_USER:?Set CLIF_AUTH_USER in .env}
+      CLIF_AUTH_PASS: ${CLIF_AUTH_PASS:?Set CLIF_AUTH_PASS in .env}
+      CLIF_AUTH_SECRET: ${CLIF_AUTH_SECRET:?Set CLIF_AUTH_SECRET in .env}
+      CLIF_HTTPS: ${CLIF_HTTPS:-false}
       NEXT_PUBLIC_POLLING_INTERVAL: "15000"
     depends_on:
       clickhouse01:
@@ -1198,7 +1204,7 @@ services:
     networks:
       - clif-net
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/api/metrics || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -1224,9 +1230,13 @@ services:
     container_name: clif-securebank
     hostname: securebank-web01
     ports:
-      - "5000:5000"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:5000:5000"
     environment:
-      FLASK_SECRET_KEY: "clif-demo-secret-key"
+      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY:?Set FLASK_SECRET_KEY in .env}
+      CLICKHOUSE_URL: http://clickhouse01:8123
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-clif_logs}
       VECTOR_HOST: clif-vector
       VECTOR_PORT: "9514"
       BANK_HOSTNAME: securebank-web01
@@ -1261,7 +1271,7 @@ services:
     container_name: clif-redpanda-console
     hostname: redpanda-console
     ports:
-      - "8080:8080"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:8080:8080"
     environment:
       CONFIG_FILEPATH: /tmp/config.yml
     volumes:
@@ -1290,7 +1300,7 @@ services:
     container_name: clif-alertmanager
     hostname: alertmanager
     ports:
-      - "9093:9093"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9093:9093"
     volumes:
       - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     command:
@@ -1323,7 +1333,7 @@ services:
     container_name: clif-prometheus
     hostname: prometheus
     ports:
-      - "9090:9090"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:9090:9090"
     volumes:
       - ./cluster/gcp/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./monitoring/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
@@ -1359,10 +1369,12 @@ services:
     container_name: clif-grafana
     hostname: grafana
     ports:
-      - "3002:3000"
+      - "${CLIF_PRIVATE_BIND_IP:-127.0.0.1}:3002:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-clif_grafana_change_me}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in .env}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clif_admin}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:?Set CLICKHOUSE_PASSWORD in .env}
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/clif-overview.json
       GF_UNIFIED_ALERTING_ENABLED: "true"
       GF_ALERTING_ENABLED: "false"

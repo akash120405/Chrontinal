@@ -33,6 +33,7 @@ Modes:
   kafka  — send only direct to Redpanda (bypass Vector)
 """
 
+import os
 from __future__ import annotations
 
 import argparse
@@ -86,7 +87,7 @@ parser.add_argument("--kafka-broker", default="localhost:19092", help="Redpanda 
 parser.add_argument("--ch-host", default="localhost")
 parser.add_argument("--ch-port", type=int, default=8123)
 parser.add_argument("--ch-user", default="clif_admin")
-parser.add_argument("--ch-password", default="Cl1f_Ch@ngeM3_2026!")
+parser.add_argument("--ch-password", default=os.getenv("CLICKHOUSE_PASSWORD", ""))
 parser.add_argument("--ch-db", default="clif_logs")
 args = parser.parse_args()
 

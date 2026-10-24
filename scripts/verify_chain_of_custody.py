@@ -1,5 +1,6 @@
 """
 Verify chain of custody integrity by re-computing Merkle roots
+import os
 from raw event hashes and comparing with stored evidence_anchors.
 """
 import hashlib
@@ -10,7 +11,7 @@ import urllib.request
 
 CH_URL = "http://10.52.166.221:8123/"
 CH_USER = "clif_admin"
-CH_PASS = "Cl1f_Ch@ngeM3_2026!"
+CH_PASS = os.environ["CLICKHOUSE_PASSWORD"]
 CH_DB = "clif_logs"
 
 

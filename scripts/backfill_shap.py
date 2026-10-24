@@ -22,7 +22,7 @@ import urllib.parse
 
 CH_URL = os.getenv("CLICKHOUSE_URL", "http://localhost:8123")
 CH_USER = os.getenv("CLICKHOUSE_USER", "clif_admin")
-CH_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD", "Cl1f_Ch@ngeM3_2026!")
+CH_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD", "")
 XAI_URL = os.getenv("XAI_SERVICE_URL", "http://localhost:8200")
 BATCH_SIZE = 50
 

@@ -13,6 +13,7 @@ Usage:
     python3 real_log_benchmark.py [--target 2000000] [--burst 500000]
 """
 
+import os
 import argparse, json, os, random, statistics, subprocess, sys, time, uuid
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -51,7 +52,7 @@ KAFKA_BROKER = os.getenv("KAFKA_BROKER", "localhost:17092")
 CH_HOST = os.getenv("CLICKHOUSE_HOST", "localhost")
 CH_PORT = int(os.getenv("CLICKHOUSE_PORT", "8123"))
 CH_USER = os.getenv("CLICKHOUSE_USER", "clif_admin")
-CH_PASS = os.getenv("CLICKHOUSE_PASSWORD", "Cl1f_Ch@ngeM3_2026!")
+CH_PASS = os.getenv("CLICKHOUSE_PASSWORD", "")
 CH_DB   = os.getenv("CLICKHOUSE_DATABASE", "clif_logs")
 
 TOPICS = ["raw-logs", "security-events", "process-events", "network-events"]

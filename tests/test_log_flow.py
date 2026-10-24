@@ -12,6 +12,7 @@ Tests:
 5. Generic event investigations (all log types)
 6. Dashboard is reachable
 """
+import os
 import json
 import requests
 import sys
@@ -46,7 +47,7 @@ try:
     import clickhouse_connect
     ch = clickhouse_connect.get_client(
         host="localhost", port=8123,
-        username="clif_admin", password="Cl1f_Ch@ngeM3_2026!",
+        username="clif_admin", password=os.environ["CLICKHOUSE_PASSWORD"],
         database="clif_logs",
     )
     tables = {

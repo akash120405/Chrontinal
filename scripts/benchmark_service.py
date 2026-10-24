@@ -12,6 +12,7 @@ Endpoints:
 
 Runs on port 5050, proxied via nginx at /benchmark/
 """
+import urllib.parse
 import http.server
 import json
 import os
@@ -28,7 +29,7 @@ PORT = 5050
 VECTOR_HOST = "127.0.0.1"
 VECTOR_PORT = 9514
 BENCHMARK_FILE = "/opt/clif/real_2m_payload.ndjson"
-CH_URL = "http://localhost:8123/?user=clif_admin&password=Cl1f_Ch%40ngeM3_2026!&database=clif_logs"
+CH_URL = ("http://localhost:8123/?" + urllib.parse.urlencode({"user": os.getenv("CLICKHOUSE_USER", "clif_admin"), "password": os.environ["CLICKHOUSE_PASSWORD"], "database": os.getenv("CLICKHOUSE_DB", "clif_logs")}))
 
 # ── Shared state ──────────────────────────────────────────────────────
 state = {

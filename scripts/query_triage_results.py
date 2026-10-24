@@ -1,10 +1,11 @@
 """Query ClickHouse for triage results from real-log test."""
+import os
 import clickhouse_connect
 import sys
 
 client = clickhouse_connect.get_client(
     host="10.52.166.221", port=8123,
-    username="clif_admin", password="Cl1f_Ch@ngeM3_2026!",
+    username="clif_admin", password=os.environ["CLICKHOUSE_PASSWORD"],
     database="clif_logs",
 )
 

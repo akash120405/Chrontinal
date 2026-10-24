@@ -29,10 +29,7 @@ function redact(value: string): string {
     .replace(/user=[^\s&]*/gi, "user=***")
     .replace(/Bearer\s+[A-Za-z0-9._~+/=-]+/g, "Bearer ***")
     .replace(/\/var\/lib\/clickhouse[^\s]*/g, "[internal-path]")
-    .replace(
-      /Cl1f_Ch@ngeM3_2026!/g,
-      "***",
-    );
+    .replace(/(?:CLICKHOUSE_PASSWORD|CH_PASSWORD)\s*[:=]\s*[^\s,}]+/gi, "CLICKHOUSE_PASSWORD=***");
 }
 
 interface LogEntry {

@@ -4,8 +4,11 @@ import urllib.request
 import urllib.error
 import json
 import http.cookiejar
+import os
 
-BASE = "http://localhost:3001"
+BASE = os.getenv("CLIF_DASHBOARD_URL", "http://localhost:3001")
+AUTH_USER = os.environ["CLIF_AUTH_USER"]
+AUTH_PASS = os.environ["CLIF_AUTH_PASS"]
 
 # 1. Test wrong creds → 401
 try:
@@ -25,7 +28,7 @@ cj = http.cookiejar.CookieJar()
 opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
 req2 = urllib.request.Request(
     f"{BASE}/api/auth",
-    data=json.dumps({"username": "admin", "password": "clif2026"}).encode(),
+    data=json.dumps({"username": AUTH_USER, "password": AUTH_PASS}).encode(),
     headers={"Content-Type": "application/json"},
     method="POST",
 )

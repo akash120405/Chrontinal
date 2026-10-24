@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider, DynamicToaster } from "@/components/theme-provider";
-import { Sidebar } from "@/components/sidebar";
-import { TopBar } from "@/components/top-bar";
-import { ErrorBoundary } from "@/components/error-boundary";
-import { ChatWidget } from "@/components/chat-widget";
+import { AppFrame } from "@/components/app-frame";
 import { cookies } from "next/headers";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Chrontinal NEXUS — Security Operations",
@@ -25,29 +18,8 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans`}>
-        {hasSession ? (
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem={false}
-            disableTransitionOnChange
-          >
-            <div className="clif-shell" id="clif-shell">
-              <TopBar />
-              <Sidebar />
-              <main className="clif-main overflow-y-auto">
-                <ErrorBoundary>
-                  <div className="page-enter p-4 lg:p-6">{children}</div>
-                </ErrorBoundary>
-              </main>
-            </div>
-            <ChatWidget />
-            <DynamicToaster />
-          </ThemeProvider>
-        ) : (
-          children
-        )}
+      <body className="font-sans">
+        <AppFrame hasSession={hasSession}>{children}</AppFrame>
       </body>
     </html>
   );

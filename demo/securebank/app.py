@@ -30,7 +30,7 @@ from flask import (
 # =============================================================================
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "clif-demo-secret-key-change-me")
+app.secret_key = os.environ["FLASK_SECRET_KEY"]
 
 VECTOR_HOST = os.environ.get("VECTOR_HOST", "localhost")
 VECTOR_PORT = int(os.environ.get("VECTOR_PORT", "9514"))
@@ -721,7 +721,7 @@ def not_found(e):
 
 _CH_HTTP = os.environ.get("CLICKHOUSE_URL", "http://10.52.166.221:8123")
 _CH_USER = os.environ.get("CLICKHOUSE_USER", "clif_admin")
-_CH_PASS = os.environ.get("CLICKHOUSE_PASS", "Cl1f_Ch@ngeM3_2026!")
+_CH_PASS = os.environ.get("CLICKHOUSE_PASSWORD", "")
 _CH_DB = os.environ.get("CLICKHOUSE_DB", "clif_logs")
 
 

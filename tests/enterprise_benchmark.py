@@ -83,7 +83,7 @@ KAFKA_BROKER = os.getenv("KAFKA_BROKER", "localhost:19092")
 CH_HOST = os.getenv("CLICKHOUSE_HOST", "localhost")
 CH_PORT = int(os.getenv("CLICKHOUSE_PORT", "8123"))
 CH_USER = os.getenv("CLICKHOUSE_USER", "clif_admin")
-CH_PASS = os.getenv("CLICKHOUSE_PASSWORD", "Cl1f_Ch@ngeM3_2026!")
+CH_PASS = os.getenv("CLICKHOUSE_PASSWORD", "")
 CH_DB = os.getenv("CLICKHOUSE_DATABASE", "clif_logs")
 
 TOPICS = ["raw-logs", "security-events", "process-events", "network-events"]

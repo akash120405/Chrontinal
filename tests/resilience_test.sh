@@ -26,7 +26,7 @@ RESET="\033[0m"
 CH_HOST="${CH_HOST:-localhost}"
 CH_PORT="${CH_PORT:-8123}"
 CH_USER="${CH_USER:-clif_admin}"
-CH_PASS="${CH_PASS:-clif_secure_password_change_me}"
+CH_PASS="${CH_PASS:-${CLICKHOUSE_PASSWORD:?Set CH_PASS or CLICKHOUSE_PASSWORD}}"
 CH_DB="${CH_DB:-clif_logs}"
 BROKER="${BROKER:-localhost:19092}"
 

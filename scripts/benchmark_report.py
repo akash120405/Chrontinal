@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Final benchmark report — collect and display complete results."""
+import os
+import urllib.parse
 import urllib.request, time, sys
 from datetime import datetime, timezone
 
-URL = "http://localhost:8123/?user=clif_admin&password=Cl1f_Ch%40ngeM3_2026!&database=clif_logs"
+URL = ("http://localhost:8123/?" + urllib.parse.urlencode({"user": os.getenv("CLICKHOUSE_USER", "clif_admin"), "password": os.environ["CLICKHOUSE_PASSWORD"], "database": os.getenv("CLICKHOUSE_DB", "clif_logs")}))
 
 def ch(q, timeout=30):
     try:

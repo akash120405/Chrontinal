@@ -1,6 +1,8 @@
+import os
+import urllib.parse
 import urllib.request, sys
 
-url = 'http://localhost:8123/?user=clif_admin&password=Cl1f_Ch%40ngeM3_2026!&database=clif_logs'
+url = ("http://localhost:8123/?" + urllib.parse.urlencode({"user": os.getenv("CLICKHOUSE_USER", "clif_admin"), "password": os.environ["CLICKHOUSE_PASSWORD"], "database": os.getenv("CLICKHOUSE_DB", "clif_logs")}))
 tables = [
     'triage_scores', 'hunter_investigations', 'verifier_results',
     'evidence_anchors', 'raw_logs', 'security_events', 'network_events',

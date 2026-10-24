@@ -54,7 +54,7 @@ DEDUP_WINDOW_SEC: int = _int("DEDUP_WINDOW_SEC", 30)
 CLICKHOUSE_HOST: str = _env("CLICKHOUSE_HOST", "clickhouse01")
 CLICKHOUSE_PORT: int = _int("CLICKHOUSE_PORT", 8123)
 CLICKHOUSE_USER: str = _env("CLICKHOUSE_USER", "clif_admin")
-CLICKHOUSE_PASSWORD: str = _env("CLICKHOUSE_PASSWORD", "clif_secure_password_change_me")
+CLICKHOUSE_PASSWORD: str = _env("CLICKHOUSE_PASSWORD", "")
 CLICKHOUSE_DATABASE: str = _env("CLICKHOUSE_DATABASE", _env("CLICKHOUSE_DB", "clif_logs"))
 
 # ---------------------------------------------------------------------------

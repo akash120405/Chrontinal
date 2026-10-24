@@ -1,5 +1,10 @@
 # Chrontinal — Cognitive Log Investigation Framework
 
+**Public frontend:** [Chrontinal SOC website](https://akash120405.github.io/chrontinal/) · [Deployment guide](DEPLOYMENT.md)
+
+For GitHub publishing and a live HTTPS deployment of the full stack, see
+[DEPLOYMENT.md](DEPLOYMENT.md).
+
 <p align="center">
 <strong>An Agentic SIEM Platform with Autonomous AI Threat Detection, Investigation, and Explainable Verdicts</strong>
 </p>

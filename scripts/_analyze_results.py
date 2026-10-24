@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Quick ClickHouse analysis of triage results."""
+import os
 import subprocess
 
 def ch_query(q):
     r = subprocess.run(
         ['docker','exec','clif-clickhouse01','clickhouse-client',
-         '--user','clif_admin','--password','Cl1f_Ch@ngeM3_2026!',
+         '--user','clif_admin','--password',os.environ["CLICKHOUSE_PASSWORD"],
          '--database','clif_logs','-q', q],
         capture_output=True, text=True
     )

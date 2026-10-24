@@ -1,33 +1,60 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const AUTH_COOKIE = "clif_session";
+const TOKEN_MAX_AGE = 60 * 60 * 24;
 
-// Paths that don't require authentication
-const PUBLIC_PATHS = ["/login", "/api/auth"];
+// Public landing, sign-in, and an unauthenticated deployment health probe.
+const PUBLIC_PATHS = new Set(["/", "/login", "/api/auth", "/api/health"]);
 
 function isPublicPath(pathname: string): boolean {
-  return PUBLIC_PATHS.some(
-    (p) => pathname === p || pathname.startsWith(p + "/"),
-  );
+  return PUBLIC_PATHS.has(pathname);
 }
 
-function verifyTokenEdge(token: string): boolean {
-  // In Edge Runtime we don't have Node crypto.createHmac so we
-  // do a basic structural + expiry check. The full HMAC verification
-  // happens on the server API routes. This keeps unauthenticated
-  // users out while avoiding Edge-incompatible Node APIs.
-  const parts = token.split(".");
-  if (parts.length !== 2) return false;
+function decodeBase64Url(value: string): ArrayBuffer {
+  const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
+  const decoded = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "="));
+  return Uint8Array.from(decoded, (char) => char.charCodeAt(0)).buffer as ArrayBuffer;
+}
+
+async function verifyTokenEdge(token: string): Promise<boolean> {
+  const secret = process.env.CLIF_AUTH_SECRET;
+  const password = process.env.CLIF_AUTH_PASS;
+  const username = process.env.CLIF_AUTH_USER?.trim();
+  if (!secret || new TextEncoder().encode(secret).length < 32 ||
+      !password || password.length < 12 || !username ||
+      !/^[A-Za-z0-9_-]{1,512}\.[A-Za-z0-9_-]{43}$/.test(token)) return false;
+
   try {
-    const payload = JSON.parse(atob(parts[0]));
-    if (payload.exp < Math.floor(Date.now() / 1000)) return false;
+    const [encoded, signature] = token.split(".");
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"],
+    );
+    const valid = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      decodeBase64Url(signature),
+      new TextEncoder().encode(encoded),
+    );
+    if (!valid) return false;
+
+    const payload = JSON.parse(new TextDecoder().decode(decodeBase64Url(encoded)));
+    const now = Math.floor(Date.now() / 1000);
+    return payload.v === 1 &&
+      Number.isInteger(payload.iat) &&
+      Number.isInteger(payload.exp) &&
+      payload.iat <= now + 60 &&
+      payload.exp > now &&
+      payload.exp <= payload.iat + TOKEN_MAX_AGE;
   } catch {
     return false;
   }
-  return true;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow public paths (login page, auth API, static assets)
@@ -45,8 +72,13 @@ export function middleware(request: NextRequest) {
 
   const token = request.cookies.get(AUTH_COOKIE)?.value;
 
-  if (!token || !verifyTokenEdge(token)) {
-    // Redirect to login
+  if (!token || !(await verifyTokenEdge(token))) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401, headers: { "Cache-Control": "no-store" } },
+      );
+    }
     const loginUrl = new URL("/login", request.url);
     return NextResponse.redirect(loginUrl);
   }

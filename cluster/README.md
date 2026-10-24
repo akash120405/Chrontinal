@@ -221,7 +221,7 @@ Edit `dashboard/.env.local` on PC2 or MacBook:
 CH_HOST=192.168.1.100    # ← PC1's LAN IP (was localhost)
 CH_PORT=8123
 CH_USER=clif_admin
-CH_PASSWORD=Cl1f_Ch@ngeM3_2026!
+CH_PASSWORD=<set-the-private-ClickHouse-password>
 LANCEDB_URL=http://localhost:8100
 ```
 

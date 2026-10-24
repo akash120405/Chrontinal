@@ -41,7 +41,7 @@ func LoadConfig() *Config {
 		ClickHouseAltHosts: envStr("CLICKHOUSE_ALT_HOSTS", ""),
 		ClickHousePort:     envInt("CLICKHOUSE_PORT", 9000),
 		ClickHouseUser:     envStr("CLICKHOUSE_USER", "clif_admin"),
-		ClickHousePassword: envStr("CLICKHOUSE_PASSWORD", "clif_secure_password_change_me"),
+		ClickHousePassword: envStr("CLICKHOUSE_PASSWORD", ""),
 		ClickHouseDB:       envStr("CLICKHOUSE_DB", "clif_logs"),
 		ConsumerGroup:      envStr("CONSUMER_GROUP_ID", "clif-clickhouse-consumer"),
 		BatchSize:          envInt("CONSUMER_BATCH_SIZE", 500000),
@@ -84,6 +84,9 @@ func envFloat(key string, def float64) float64 {
 // ── Pre-flight validation ──────────────────────────────────────────────────
 
 func preflight(cfg *Config) error {
+	if cfg.ClickHousePassword == "" {
+		return fmt.Errorf("CLICKHOUSE_PASSWORD is required")
+	}
 	// 1. Verify Kafka/Redpanda connectivity
 	brokers := strings.Split(cfg.KafkaBrokers, ",")
 	for i := range brokers {

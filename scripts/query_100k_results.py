@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Query ClickHouse for 100K test results."""
+import os
 import subprocess, sys
 
 CH_CMD = [
     "docker", "exec", "clif-clickhouse01", "clickhouse-client",
-    "--user", "clif_admin", "--password", "Cl1f_Ch@ngeM3_2026!",
+    "--user", "clif_admin", "--password", os.environ["CLICKHOUSE_PASSWORD"],
     "-d", "clif_logs", "--format", "PrettyCompact",
 ]
 

@@ -1,10 +1,11 @@
 """Deep SSH analysis after brute force rule deployment."""
+import os
 import urllib.request
 import urllib.parse
 
 CH_URL = "http://localhost:8123/"
 CH_USER = "clif_admin"
-CH_PASS = "Cl1f_Ch@ngeM3_2026!"
+CH_PASS = os.environ["CLICKHOUSE_PASSWORD"]
 CH_DB = "clif_logs"
 
 def query(sql):
