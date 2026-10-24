@@ -1,6 +1,6 @@
 # Chrontinal — Cognitive Log Investigation Framework
 
-**Public frontend:** [Chrontinal SOC website](https://akash120405.github.io/chrontinal/) · [Deployment guide](DEPLOYMENT.md)
+**Public frontend:** [Chrontinal SOC website](https://akash120405.github.io/Chrontinal/) · [Deployment guide](DEPLOYMENT.md)
 
 For GitHub publishing and a live HTTPS deployment of the full stack, see
 [DEPLOYMENT.md](DEPLOYMENT.md).
